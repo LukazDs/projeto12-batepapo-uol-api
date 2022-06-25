@@ -76,14 +76,18 @@ server.post("/participants", async (req, res) => {
 
 server.get("/messages", async (req, res) => {
 
+    const user = req.headers.user;
+
     const nowMessages = await db.collection('messages').find().toArray();
 
     const limit = (req.query.limit !== undefined) 
         ? Number(req.query.limit) : nowMessages.length;
 
-    nowMessages.reverse()
+    nowMessages.reverse();
 
-    res.send(nowMessages.slice(0, limit))
+    const filterMsg = nowMessages.filter(v => v.to === user || v.from === user || v.to === "Todos")
+
+    res.send(filterMsg.slice(0, limit));
 
 })
 
