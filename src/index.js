@@ -74,7 +74,10 @@ server.post("/participants", async (req, res) => {
 
 server.get("/messages", async (req, res) => {
 
+    const limit = req.query.limit;
     const nowMessages = await db.collection('messages').find().toArray();
+
+    console.log(limit)
     res.send(nowMessages)
     
 })
