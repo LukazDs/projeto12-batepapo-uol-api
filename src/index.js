@@ -72,6 +72,13 @@ server.post("/participants", async (req, res) => {
 
 })
 
+server.get("/messages", async (req, res) => {
+
+    const nowMessages = await db.collection('messages').find().toArray();
+    res.send(nowMessages)
+    
+})
+
 server.post("/messages", async (req, res) => {
 
     const nowUsers = await db.collection('users').find().toArray();
@@ -101,7 +108,7 @@ server.post("/messages", async (req, res) => {
     try {
 
         const time = `${dayjs().hour()}:${dayjs().minute()}:${dayjs().second()}`
-        await db.collection("message").insertOne({...message, time})
+        await db.collection("messages").insertOne({...message, time})
 
         res.sendStatus(201);
 
