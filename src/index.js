@@ -66,4 +66,11 @@ server.post("/participants", async (req, res) => {
 
 })
 
+server.post("/messages", (req, res) => {
+
+    const message = {...req.body, from: req.headers.user};
+    
+    console.log(message)
+})
+
 server.listen(5000);
