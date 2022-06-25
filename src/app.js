@@ -17,4 +17,12 @@ const server = express();
 server.use(express.json());
 server.use(cors());
 
-server.listen(5000)
+const user = {name: 'João', lastStatus: 12313123};
+const message = {
+        from: 'João', 
+        to: 'Todos', 
+        text: 'oi galera', 
+        type: 'message', 
+        time: '20:04:37'};
+
+server.listen(5000);
