@@ -67,7 +67,7 @@ server.post("/participants", async (req, res) => {
         res.sendStatus(201);
 
     } catch(error) {
-        console.log(error)
+        console.log(error);
     }
 
 })
@@ -91,11 +91,23 @@ server.post("/messages", async (req, res) => {
     }
 
     const message = {...partMessage, from};
-
     const validation = messageSchema.validate(message, {abortEarly: true})
 
-    res.sendStatus(200)
-    
+    if(validation.error) {
+        res.sendStatus(422);
+        return;
+    }
+
+    try {
+
+        const time = `${dayjs().hour()}:${dayjs().minute()}:${dayjs().second()}`
+        await db.collection("message").insertOne({...message, time})
+
+        res.sendStatus(200);
+
+    } catch(error) {
+        console.log(error);
+    }
 })
 
 server.listen(5000);
