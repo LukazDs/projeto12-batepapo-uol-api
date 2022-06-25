@@ -1,11 +1,12 @@
 import express from 'express';
+import cors from "cors";
 import { MongoClient, ObjectId } from "mongodb";
 import dotenv from "dotenv";
 import joi from "joi";
 
 dotenv.config();
 
-const mongoClient = new MongoClient(process.env.MONGO_URI_);
+const mongoClient = new MongoClient(process.env.MONGO_URI);
 let db;
 
 mongoClient.connect(() => {
@@ -24,5 +25,11 @@ const message = {
         text: 'oi galera', 
         type: 'message', 
         time: '20:04:37'};
+
+
+server.post("/participants", (req, res) => {
+    const userName = req.body.name;
+    res.send(userName);
+})
 
 server.listen(5000);
