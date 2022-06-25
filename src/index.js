@@ -103,7 +103,7 @@ server.post("/messages", async (req, res) => {
         const time = `${dayjs().hour()}:${dayjs().minute()}:${dayjs().second()}`
         await db.collection("message").insertOne({...message, time})
 
-        res.sendStatus(200);
+        res.sendStatus(201);
 
     } catch(error) {
         console.log(error);
