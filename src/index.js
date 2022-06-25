@@ -19,7 +19,13 @@ const server = express();
 server.use(express.json());
 server.use(cors());
 
-const userSchema = joi.object({ name: joi.string().required() }); /// colocar latusers
+const userSchema = joi.object({ name: joi.string().required() }); 
+
+const messageSchema = joi.object({ 
+        to: joi.string().required(),
+        text: joi.string().required(),
+        type: joi.string().required(),
+        from: joi.string().required()}); 
 
 server.get("/participants", async (req, res) => {
 
@@ -66,11 +72,30 @@ server.post("/participants", async (req, res) => {
 
 })
 
-server.post("/messages", (req, res) => {
+server.post("/messages", async (req, res) => {
 
-    const message = {...req.body, from: req.headers.user};
+    const nowUsers = await db.collection('users').find().toArray();
+    const from = req.headers.user;
+    const partMessage = req.body;
+
+    const types = ["message", "private_message"];
+
+    if(!nowUsers.some(v => v.name === from)) {
+        res.sendStatus(422);
+        return;
+    }
+
+    if(!types.some(v => v === partMessage.type)) {
+        res.sendStatus(422);
+        return;
+    }
+
+    const message = {...partMessage, from};
+
+    const validation = messageSchema.validate(message, {abortEarly: true})
+
+    res.sendStatus(200)
     
-    console.log(message)
 })
 
 server.listen(5000);
