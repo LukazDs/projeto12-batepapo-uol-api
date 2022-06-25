@@ -20,7 +20,7 @@ server.use(cors());
 
 const userSchema = joi.object({ name: joi.string().required() }); /// colocar latusers
 
-server.post("/participants", (req, res) => {
+server.post("/participants", async (req, res) => {
     const userName = req.body;
 
     const validation = userSchema.validate(userName, {abortEarly: true});
@@ -30,7 +30,24 @@ server.post("/participants", (req, res) => {
         return;
     }
 
-    res.send(userName);
+    try {
+        const nowUsers = await db.collection('users').find().toArray();
+
+        if(nowUsers.some(v => v.name === userName.name)) {
+            res.sendStatus(409);
+            return;
+        }
+
+        await db.collection("users").insertOne({...userName, lastStatus: Date.now()});
+        
+        console.log(nowUsers);
+        
+        res.sendStatus(201);
+
+    } catch(error) {
+        console.log(error)
+    }
+
 })
 
 server.listen(5000);
