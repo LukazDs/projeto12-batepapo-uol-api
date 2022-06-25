@@ -21,6 +21,13 @@ server.use(cors());
 
 const userSchema = joi.object({ name: joi.string().required() }); /// colocar latusers
 
+server.get("/participants", async (req, res) => {
+
+    const nowUsers = await db.collection('users').find().toArray();
+    res.send(nowUsers)
+    
+})
+
 server.post("/participants", async (req, res) => {
     const userName = req.body;
 
@@ -32,8 +39,8 @@ server.post("/participants", async (req, res) => {
     }
 
     try {
+
         const nowUsers = await db.collection('users').find().toArray();
-        const nowMessages = await db.collection('messages').find().toArray();
 
         if(nowUsers.some(v => v.name === userName.name)) {
             res.sendStatus(409);
@@ -50,8 +57,6 @@ server.post("/participants", async (req, res) => {
                 text: 'entra na sala...', 
                 type: 'status', 
                 time: time})
-        
-        console.log(nowMessages);
         
         res.sendStatus(201);
 
