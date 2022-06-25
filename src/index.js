@@ -10,7 +10,7 @@ const mongoClient = new MongoClient(process.env.MONGO_URI);
 let db;
 
 mongoClient.connect(() => {
-    db = mongoClient.db("api_uol")
+    db = mongoClient.db("api_uol");
 })
 
 const server = express();
@@ -18,17 +18,18 @@ const server = express();
 server.use(express.json());
 server.use(cors());
 
-const user = {name: 'João', lastStatus: 12313123};
-const message = {
-        from: 'João', 
-        to: 'Todos', 
-        text: 'oi galera', 
-        type: 'message', 
-        time: '20:04:37'};
-
+const userSchema = joi.object({ name: joi.string().required() }); /// colocar latusers
 
 server.post("/participants", (req, res) => {
-    const userName = req.body.name;
+    const userName = req.body;
+
+    const validation = userSchema.validate(userName, {abortEarly: true});
+
+    if(validation.error) {
+        res.sendStatus(422);
+        return;
+    }
+
     res.send(userName);
 })
 
