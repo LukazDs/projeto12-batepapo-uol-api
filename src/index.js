@@ -28,7 +28,7 @@ const messageSchema = joi.object({
     from: joi.string().required()
 });
 
-server.get("/participants", async (req, res) => {
+server.get("/participants", async (_req, res) => {
 
     const nowUsers = await db.collection('users').find().toArray();
     res.send(nowUsers)
@@ -142,25 +142,47 @@ server.post("/status", async (req, res) => {
     try {
         const filter = { name };
         const options = { upsert: true };
-    
+
         const updateDoc = {
-    
-          $set: {
-    
-            lastStatus: Date.now()
-    
-          },
-    
+
+            $set: {
+
+                lastStatus: Date.now()
+
+            },
+
         };
-    
+
         await users.updateOne(filter, updateDoc, options);
-    
+
         res.sendStatus(200);
 
-    } catch(error) {
+    } catch (error) {
         console.log(error);
     }
-
 })
+
+async function removeInInterval() {
+    let nowUsers = await db.collection('users').find().toArray();
+    let paramTime = Date.now();
+
+    await nowUsers.forEach(v => {
+
+        if (!v.name) {
+            return;
+        }
+        let msg = { from: v.name, to: 'Todos', text: 'sai da sala...', type: 'status' }
+        const time = `${dayjs().hour()}:${dayjs().minute()}:${dayjs().second()}`
+        console.log(msg)
+        db.collection("messages").insertOne({ ...msg, time })
+
+        if (paramTime - v.lastStatus < 10000) {
+            db.collection("users").deleteOne(
+                { lastStatus: v.lastStatus })
+        }
+    })
+}
+
+setInterval(() => removeInInterval(), 15000)
 
 server.listen(5000);
