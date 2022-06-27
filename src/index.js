@@ -173,7 +173,7 @@ async function removeInInterval() {
         }
         let msg = { from: v.name, to: 'Todos', text: 'sai da sala...', type: 'status' }
         const time = `${dayjs().hour()}:${dayjs().minute()}:${dayjs().second()}`
-        console.log(msg)
+     
         db.collection("messages").insertOne({ ...msg, time })
 
         if (paramTime - v.lastStatus < 10000) {
