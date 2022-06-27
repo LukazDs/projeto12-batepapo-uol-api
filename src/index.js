@@ -129,4 +129,11 @@ server.post("/messages", async (req, res) => {
     }
 })
 
+server.post("/status", async (req, res) => {
+    const name = req.headers.user;
+    const nowUsers = await db.collection("users").find().toArray();
+    
+    res.send(name);
+})
+
 server.listen(5000);
