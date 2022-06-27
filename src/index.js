@@ -80,7 +80,7 @@ server.get("/messages", async (req, res) => {
 
     const nowMessages = await db.collection('messages').find().toArray();
 
-    const limit = (req.query.limit !== undefined) 
+    const limit = (req.query.limit !== undefined)
         ? Number(req.query.limit) : nowMessages.length;
 
     nowMessages.reverse();
@@ -131,14 +131,36 @@ server.post("/messages", async (req, res) => {
 
 server.post("/status", async (req, res) => {
     const name = req.headers.user;
-    const nowUsers = await db.collection("users").find().toArray();
+    const users = await db.collection("users")
+    const nowUserFilter = await users.findOne({ name });
 
-    if(!nowUsers.some(v => v.name === name)) {
+    if (!nowUserFilter) {
         res.sendStatus(404);
         return;
     }
 
-    res.send(name);
+    try {
+        const filter = { name };
+        const options = { upsert: true };
+    
+        const updateDoc = {
+    
+          $set: {
+    
+            lastStatus: Date.now()
+    
+          },
+    
+        };
+    
+        await users.updateOne(filter, updateDoc, options);
+    
+        res.sendStatus(200);
+
+    } catch(error) {
+        console.log(error);
+    }
+
 })
 
 server.listen(5000);
